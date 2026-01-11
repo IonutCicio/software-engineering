@@ -1,12 +1,12 @@
 #include <iostream>
 
 struct Potato {
-    float weight_g;
+    float weight_g; // grams
 };
 
 struct Person {
     std::string name;
-    float weight_kg;
+    float weight_kg; // kilograms
 
     void operator+=(const Potato &potato) {
         this->weight_kg += potato.weight_g / 1000;

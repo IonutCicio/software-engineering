@@ -5,19 +5,19 @@
 
 int main() {
     System system;
-    Stopwatch stopwatch;
-    TrafficLight traffic_light(system);
+    Time time(1);
+    TrafficLight traffic_light(time);
 
-    system.addObserver(&stopwatch);
+    system.addObserver(&time);
 
     std::ofstream file("logs");
 
-    while (stopwatch.elapsedTime() <= HORIZON) {
-        file << stopwatch.elapsedTime() << ' '
+    while (time.elapsedTime() <= HORIZON) {
+        file << time.elapsedTime() << ' '
              << traffic_light.light() << std::endl;
         system.next();
     }
 
     file.close();
-    return 0;
+    return EXIT_SUCCESS;
 }

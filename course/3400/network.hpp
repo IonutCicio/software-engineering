@@ -7,30 +7,37 @@
 #include <cstdlib>
 #include <random>
 
-class Network : public TimerBasedEntity,
+class Network : public Observer<Timer *>,
                 public Buffer<NetworkPayloadLight>,
                 public Notifier<LightUpdateMessage> {
+
     std::bernoulli_distribution random_fault;
     std::bernoulli_distribution random_repair;
 
   public:
-    Network(System &system)
-        : TimerBasedEntity(system, 0, TimerMode::Once), random_fault(0.01),
-          random_repair(0.001) {}
+    Timer *timer;
+
+    Network(Time &time)
+        : random_fault(0.01), random_repair(0.001) {
+        timer = new Timer(0, TimerMode::Once, &time, this);
+    }
 
     void update(NetworkPayloadLight payload) override {
-        if (buffer.empty())
-            timer.resetWithDuration(2);
+        if (buffer.empty()) {
+            timer->resetWithDuration(2);
+        }
         Buffer<NetworkPayloadLight>::update(payload);
     }
 
-    void update(TimerEnded) override {
+    void update(Timer *timer) override {
         if (!buffer.empty()) {
-            if (!random_fault(urng) || random_repair(urng))
+            if (!random_fault(urng) || random_repair(urng)) {
                 notify((Light)buffer.front());
+            }
             buffer.pop_front();
-            if (!buffer.empty())
-                timer.resetWithDuration(2);
+            if (!buffer.empty()) {
+                timer->resetWithDuration(2);
+            }
         }
     }
 };

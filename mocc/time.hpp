@@ -1,18 +1,16 @@
 #pragma once
 
-#include "alias.hpp"
 #include "mocc.hpp"
 #include "notifier.hpp"
+#include "observer.hpp"
 #include "system.hpp"
-
-STRONG_ALIAS(StopwatchElapsedTime, real_t)
 
 /* docs.rs/bevy/latest/bevy/time/struct.Stopwatch.html
  * An object that measures time. It is a SystemObserver, so it must be attached
  * to a System for it to measure the time elapsed in the systme.
  *
  * System system.
- * Stopwatch stopwatch.
+ * Stopwatch stopwatch(1).
  *
  * system.addObserver(&stopwatch);
  * system.next();
@@ -20,27 +18,22 @@ STRONG_ALIAS(StopwatchElapsedTime, real_t)
  *
  * stopwatch.elapsedTime(); // 2
  * */
-class Stopwatch : public SystemObserver, public Notifier<StopwatchElapsedTime> {
+class Time : public Observer<>, public Notifier<Time *> {
   private:
     real_t elapsed_time = 0;
     const real_t time_step;
 
   public:
-    Stopwatch(real_t time_step = 1);
+    Time(real_t time_step, System *system = nullptr);
 
-    /* Returns the "elapsed time" since the Stopwatch was connected to the
-     * system or was reset.
-     */
+    real_t timeStep();
+
+    /* Returns the "elapsed time" since the Time was started. */
     real_t elapsedTime();
-
-    /* Resets the "elapsed time" to 0. */
-    void reset();
 
     /* Synchronizes to a system. */
     void update() override;
 };
-
-STRONG_ALIAS(TimerEnded, real_t)
 
 enum class TimerMode {
     /* When the timer ends it doesn't restart. */
@@ -55,44 +48,28 @@ enum class TimerMode {
  * It updates the elapsed time as the system is simulated, until the duration of
  * the timer is over.
  * */
-class Timer : public SystemObserver, public Notifier<TimerEnded> {
+class Timer : public Observer<Time *>, public Notifier<Timer *> {
   private:
     real_t duration, elapsed_time = 0;
     bool is_finished = false;
-    const real_t time_step;
     TimerMode mode;
 
   public:
-    Timer(real_t duration, TimerMode mode, real_t time_step);
+    Timer(
+        real_t duration,
+        TimerMode mode,
+        Time *time = nullptr,
+        Observer<Timer *> *observer = nullptr
+    );
 
     /* Resets the timer with a new initial duration. */
     void resetWithDuration(real_t duration);
 
     /* Synchronizes to a system. */
-    void update() override;
+    void update(Time *) override;
 };
 
-/* Many entities are slower than the system's simulation speed. These entities
- * need to be connected to a timer.
- *
- * This is a boilerplate class which proves to be useful quite often.
- * */
-class TimerBasedEntity : public Observer<TimerEnded> {
-  protected:
-    /* An timer based entity has access to the timer it is connected to.
-     * It can call resetWithDuration() if the timer is not repeating.
-     * */
-    Timer timer;
-
-  public:
-    TimerBasedEntity(
-        System &system,
-        real_t duration,
-        TimerMode mode,
-        real_t time_step
-    )
-        : timer(duration, mode, time_step) {
-        system.addObserver(&timer);
-        timer.addObserver(this);
-    }
-};
+// TODO: smart pointers
+// TODO: option could be useful too! std::option<std::shared_ptr<System>> or
+// std::option<System *>
+// TODO: how to handle any type of ref in Notifier?

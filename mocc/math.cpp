@@ -2,7 +2,7 @@
 
 // clang-format off
 
-void OnlineDataAnalysis::insertDataPoint(real_t data_point) {
+void DataDistribution::insertDataPoint(real_t data_point) {
     real_t mean_prev_size =
         mean_ * (
             (real_t)number_of_data_points / 
@@ -16,9 +16,9 @@ void OnlineDataAnalysis::insertDataPoint(real_t data_point) {
     number_of_data_points++;
 }
 
-real_t OnlineDataAnalysis::mean() const { return mean_; }
+real_t DataDistribution::mean() const { return mean_; }
 
-real_t OnlineDataAnalysis::stddev() const {
+real_t DataDistribution::stddev() const {
     return number_of_data_points > 0 ? 
         sqrt(m_2__ / number_of_data_points) : 0;
 }

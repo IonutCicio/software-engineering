@@ -5,7 +5,7 @@
 /* (uniform random number generator) */
 using urng_t = std::default_random_engine;
 using real_t = double;
-using matrix = std::vector<std::vector<real_t>>;
+template <typename T> using matrix = std::vector<std::vector<T>>;
 
 urng_t pseudo_random_engine_from_device();
 

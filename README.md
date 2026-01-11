@@ -1,22 +1,20 @@
 # Software Engineering
 
-Software Engineering course @ Sapienza Università di Roma
+"Ingegneria del Software" (Software Engineering) course @ Sapienza Università di Roma. 
 
-> [!CAUTION]
-> The pdf isn't currently synchronized with the code
+> [!NOTE]
+> Hopefully this helps you :)
 
 ## Content
 
 The guide has 7 sections:
-- formal definitions for *software models* 
-- specific `C++` tips & tricks for the exam
-- tips for debugging with `gdb`
-- a discussion of the examples seen during the lectures
-- a typical exam solution
-- a library designed for the lab exam
-- extras (interesting software engineering tools)
+- `software-engineering.pdf`
+    - formal definitions for **software modeling**
+    - `C++` tips for the exam
+    - tips for debugging with `gdb`
+    - explanations _(and rewrites)_ of the examples presented during the lectures (`/course` folder)
+- `/exams`: _(some)_ past exams solutions
+- `/mocc`: library designed for the lab exam
 
-## TODO
-
-- reference files for code in listings from 3100 onwards
-- reintroduce raw code references
+> [!NOTE]  
+> Soon a grader for the exams will be available

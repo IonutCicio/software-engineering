@@ -2,14 +2,36 @@
 #include <fstream>
 #include <iostream>
 #include <random>
+#include <vector>
 
 #include "../../../mocc/math.hpp"
 #include "../../../mocc/mocc.hpp"
 #include "../../../mocc/system.hpp"
 #include "../../../mocc/time.hpp"
-#include "parameters.hpp"
-#include "uav.hpp"
-#include <random>
+
+static urng_t urng = pseudo_random_engine_from_device();
+static std::uniform_real_distribution<real_t> random_position;
+static real_t T, H, M, N, L, V, A, D;
+
+struct UAV : Observer<> {
+
+    std::vector<real_t> x, v, p;
+
+    UAV() : x(3, 0), v(3, 0), p(3, 0) {
+        for (size_t k = 0; k < 3; k++) {
+            x[k] = random_position(urng);
+        }
+    }
+
+    void update() override {
+        for (size_t k = 0; k < 3; k++) {
+            x[k] += v[k] * T;
+            p[k] = exp(-A * ((x[k] + L) / (2 * L)));
+            std::bernoulli_distribution speed(p[k]);
+            v[k] = speed(urng) ? V : -V;
+        }
+    }
+};
 
 int main() {
     {
@@ -23,12 +45,11 @@ int main() {
         random_position = std::uniform_real_distribution<real_t>(-L, L);
     }
 
-    OnlineDataAnalysis collisions_data;
+    DataDistribution collisions_distribution;
     for (size_t simulation = 0; simulation < M; simulation++) {
         System system;
-        Stopwatch stopwatch(T);
+        Time time(T, &system);
 
-        system.addObserver(&stopwatch);
         std::vector<UAV *> uavs;
         for (size_t _ = 0; _ < N; _++) {
             UAV *uav = new UAV();
@@ -38,7 +59,7 @@ int main() {
         }
 
         size_t collisions = 0;
-        while (stopwatch.elapsedTime() <= H) {
+        while (time.elapsedTime() <= H) {
             system.next();
 
             for (size_t i = 0; i < N; i++) {
@@ -56,9 +77,11 @@ int main() {
             }
         }
 
-        collisions_data.insertDataPoint((real_t)collisions / H);
+        collisions_distribution.insertDataPoint((real_t)collisions / H);
     }
 
-    std::ofstream("results.txt") << "2025-01-09\nC " << collisions_data.mean();
-    return 0;
+    std::ofstream("results.txt")
+        << "2025-01-09\nC " << collisions_distribution.mean() << std::endl;
+
+    return EXIT_SUCCESS;
 }

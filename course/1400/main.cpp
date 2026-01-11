@@ -35,5 +35,5 @@ int main() {
     }
 
     file.close();
-    return 0;
+    return EXIT_SUCCESS;
 }

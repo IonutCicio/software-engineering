@@ -4,7 +4,7 @@
 #set heading(numbering: "1.1")
 #set math.equation(numbering: "(1)")
 #set raw(lang: "cpp")
-#set list(marker: [--])
+// #set list(marker: [--])
 
 #show sym.emptyset: sym.diameter
 #show figure: set block(breakable: true)
@@ -451,14 +451,14 @@ probability that the feature costs less than $550 euro$, is calculated as
 $
     #math.frac([number of experiments with value $0 +$ number of experiments
         with value
-        $1$], [total number of experiments]) \ =^1 \
+        $1$], [total number of experiments]) \ =^(1.) \
     #math.frac([number of experiments with value $1$], [total number of
-        experiments]) \ =^2 \
+        experiments]) \ =^(2.) \
     #math.frac([number of experiments with value less than $550 euro$], [total
         number of experiments])
 $
 
-1. $0$ is the neutral element of the sum
+1. $0$ is the identity element of the sum
 2. by the definition in @montecarlo-bernoulli
 
 This type of calculation can be very easily distributed on a HPC cluster, and is
@@ -466,7 +466,6 @@ generally an embarrassingly parallel problem @embarrassingly-parallel, since
 each experiment is independent from the others.
 
 // - TODO: find the analytical result, compare to simulation $approx 0.3569$
-
 
 #pagebreak()
 
@@ -732,7 +731,7 @@ To map the integers to the actual items #raw-ref(2) an `enum` is used: for
 simple enums each entry can be converted automatically to its integer value (and
 viceversa). In `C++` there is another construct, the `enum class` which doesn't
 allow implicit conversion (the conversion must be done with a function or with
-`static_cast`), but it's more typesafe (see @enum).
+`static_cast`), but it's more typesafe. // (see @enum).
 
 The `discrete_distribution` can also be used for transition matrices, like the
 one in @rainy-sunny-transition-matrix. It's enough to assign each state a number
@@ -771,125 +770,125 @@ works with dynamic arrays too.
 
 #pagebreak()
 
-== Memory and data structures
-
-=== Manual memory allocation
-
-If you allocate with `new`, you must deallocate with `delete`, you can't mixup
-them with ```c malloc()``` and ```c free()```
-
-To avoid manual memory allocation, most of the time it's enough to use the
-structures in the standard library, like `std::vector<T>`.
-
-=== Data structures
-
-==== Vectors <std-vector>
-// === `std::vector<T>()` <std-vector>
-
-You don't have to allocate memory, basically never! You just use the structures
-that are implemented in the standard library, and most of the time they are
-enough for our use cases. They are really easy to use.
-
-Vectors can be used as stacks.
-
-==== Deques <std-deque>
-
-// === ```cpp std::deque<T>()``` <std-deque>
-Deques are very common, they are like vectors, but can be pushed and popped in
-both ends, and can b used as queues.
-
-==== Sets <std-set>
-
-Not needed as much, works like the Python set. Can be either a set (ordered) or
-an unordered set (uses hashes)
-
-==== Maps <std-map>
-
-Could be useful. Can be either a map (ordered) or an unordered map (uses hashes)
-
-== Simplest method to work with *files*
-// == Input/Output
+// == Memory and data structures
 //
-// Input output is very simple in C++.
+// === Manual memory allocation
 //
-// === Standard I/O <iostream>
+// If you allocate with `new`, you must deallocate with `delete`, you can't mixup
+// them with ```c malloc()``` and ```c free()```
 //
-// === Files <files>
+// To avoid manual memory allocation, most of the time it's enough to use the
+// structures in the standard library, like `std::vector<T>`.
 //
-// Working with files is way easier in `C++`
+// === Data structures
 //
-// ```cpp
-// #include <fstream>
+// ==== Vectors <std-vector>
+// // === `std::vector<T>()` <std-vector>
 //
-// int main(){
-//     std::ofstream output("output.txt");
-//     std::ifstream params("params.txt");
+// You don't have to allocate memory, basically never! You just use the structures
+// that are implemented in the standard library, and most of the time they are
+// enough for our use cases. They are really easy to use.
 //
-//     while (etc...) {}
+// Vectors can be used as stacks.
 //
-//     output.close();
-//     params.close();
-// }
+// ==== Deques <std-deque>
+//
+// // === ```cpp std::deque<T>()``` <std-deque>
+// Deques are very common, they are like vectors, but can be pushed and popped in
+// both ends, and can b used as queues.
+//
+// ==== Sets <std-set>
+//
+// Not needed as much, works like the Python set. Can be either a set (ordered) or
+// an unordered set (uses hashes)
+//
+// ==== Maps <std-map>
+//
+// Could be useful. Can be either a map (ordered) or an unordered map (uses hashes)
+//
+// == Simplest method to work with *files*
+// // == Input/Output
+// //
+// // Input output is very simple in C++.
+// //
+// // === Standard I/O <iostream>
+// //
+// // === Files <files>
+// //
+// // Working with files is way easier in `C++`
+// //
+// // ```cpp
+// // #include <fstream>
+// //
+// // int main(){
+// //     std::ofstream output("output.txt");
+// //     std::ifstream params("params.txt");
+// //
+// //     while (etc...) {}
+// //
+// //     output.close();
+// //     params.close();
+// // }
+// // ```
+//
+// == Program structure
+//
+// === Classes
+//
+// - TODO:
+//     - Maybe constructor
+//     - Maybe operators? (more like nah)
+//     - virtual stuff (interfaces)
+//
+// === Structs
+//
+// - basically like classes, but with everything public by default
+//
+// === Enums <enum>
+//
+// - enum vs enum class
+// - an example maybe
+// - they are useful enough to model a finite domain
+//
+// === Inheritance
+//
+// #pagebreak()
+//
+// = Fixing segfaults with gdb
+//
+// It's super useful! Trust me, if you learn this everything is way easier (printf
+// won't be useful anymore)
+//
+// First of all, use the `-ggdb3` flags to compile the code. Remember to not use
+// any optimization like `-O3`... using optimizations makes the program harder to
+// debug.
+//
+// ```makefile
+// DEBUG_FLAGS := -ggdb3 -Wall -Wextra -pedantic
 // ```
+//
+// Then it's as easy as running `gdb ./main`
+//
+// - TODO: could be useful to write a script if too many args
+// - TODO: just bash code to compile and run
+// - TODO (just the most useful stuff, technically not enough):
+//     - r
+//     - c
+//     - n
+//     - c 10
+//     - enter (last instruction)
+//     - b
+//         - on lines
+//         - on symbols
+//         - on specific files
+//     - clear
+//     - display
+//     - set print pretty on
+//
+//
+// #pagebreak()
 
-== Program structure
-
-=== Classes
-
-- TODO:
-    - Maybe constructor
-    - Maybe operators? (more like nah)
-    - virtual stuff (interfaces)
-
-=== Structs
-
-- basically like classes, but with everything public by default
-
-=== Enums <enum>
-
-- enum vs enum class
-- an example maybe
-- they are useful enough to model a finite domain
-
-=== Inheritance
-
-#pagebreak()
-
-= Fixing segfaults with gdb
-
-It's super useful! Trust me, if you learn this everything is way easier (printf
-won't be useful anymore)
-
-First of all, use the `-ggdb3` flags to compile the code. Remember to not use
-any optimization like `-O3`... using optimizations makes the program harder to
-debug.
-
-```makefile
-DEBUG_FLAGS := -ggdb3 -Wall -Wextra -pedantic
-```
-
-Then it's as easy as running `gdb ./main`
-
-- TODO: could be useful to write a script if too many args
-- TODO: just bash code to compile and run
-- TODO (just the most useful stuff, technically not enough):
-    - r
-    - c
-    - n
-    - c 10
-    - enter (last instruction)
-    - b
-        - on lines
-        - on symbols
-        - on specific files
-    - clear
-    - display
-    - set print pretty on
-
-
-#pagebreak()
-
-= Examples
+= Code presented in lectures
 
 Each example has 4 digits `xxxx` that are the same as the ones in the `software`
 folder in the course material. The code will be *as simple as possible* to
@@ -1300,299 +1299,299 @@ something like that? Idk, I should look up the code again).
 
 #pagebreak()
 
-= MOCC library
-
-
-- TODO: make and "examples" folder for the library
-- TODO: automatically generate documentation from comments
-Model CheCking library for the exam
-
-== Design
-
-Basically: the "Observer Pattern" @observer-pattern can be used to implement
-MDPs, because a MDP is like an entity that "is notified" when something happens
-(receives an input, in fact, in the case of MDPs, another name for input is
-"action"), and notifies other entities (gives an output, or reward).
-
-
-#figure(caption: `https://refactoring.guru/design-patterns/observer`)[
-    #block(
-        width: 100%,
-        inset: 1em,
-        stroke: luma(245),
-        fill: luma(254),
-        image("public/observer.png"),
-    )
-]
-
-By using the generics (templates) in `C++` it's possible to model type-safe
-MDPs, whose connections are easier to handle (if an entity receives inputs of
-type ```cpp Request```, it cannot be mistakenly connected to an entity that
-gives an output of type ```cpp Time```).
-
-#pagebreak()
-
-== ```cpp mocc```
-
-```cpp
-using real_t = double;
-```
-
-The ```cpp real_t``` type is used as an alias for floating point numbers to
-ensure the same format is used everywhere in the library.
-
-```cpp
-using urng_t = std::default_random_engine;
-```
-
-The ```cpp urng_t``` type is used as an alias for
-```cpp std::default_random_engine``` to make the code easier to write.
-
-== ```cpp math```
-
-```cpp
-class Stat
-```
-
-The ```cpp Stat``` class is used to calculate the mean and the standard
-deviation of a set of values (as discussed in @incremental-average and @welford)
-
-#block(inset: (left: 1em))[
-    ```cpp
-    void save(real_t x);
-    ```
-
-    The ```cpp save()``` method is used to add a value to the set of values. The
-    mean and the standard deviation are automatically updated when a new value
-    is saved.
-
-    ```cpp
-    real_t mean() const;
-    ```
-
-    Returns the precalculated mean.
-
-    ```cpp
-    real_t stddev() const;
-    ```
-
-    Returns the precalculated standard deviation.
-
-    #heading(level: 3, outlined: false, numbering: none)[Example]
-
-    ```cpp
-    Stat cost_stat;
-
-    cost_stat.save(302);
-    cost_stat.save(305);
-    cost_stat.save(295);
-    cost_stat.save(298);
-
-    std::cout
-      << cost_stat.mean() << " "
-      << cost_stat.stddev() << std::endl;
-    ```
-]
-
-#pagebreak()
-
-== ```cpp time```
-
-
-```cpp
-STRONG_ALIAS(T, real_t)
-```
-
-The ```class T``` is the type for the *time*, it's reperesented as a
-```cpp real_t``` to allow working in smaller units of time (for exapmle, when
-the main unit of time of the simulation is the _minute_, it could still be
-useful to work with _seconds_). ```class T``` is a *strong alias*, meaning that
-if a MDP takes in input ```cpp T```, it cannot be connected to a MDP that gives
-in output a simple ```cpp real_t```.
-
-```cpp
-class Stopwatch : public Observer<>, public Notifier<T>
-```
-
-A ```cpp Stopwatch``` starts at time ```cpp 0```, and each iteration of the
-system it increments it's time counter by $Delta$. It can be used to measure
-time from a certain point of the simulation (it can be at any point of the
-simulation). It sends a notification with the elapsed time at each iteration.
-
-#block(inset: (left: 1em))[
-    ```cpp
-    Stopwatch(real_t delta = 1);
-    ```
-
-    The default $Delta$ for the ```cpp Stopwatch``` is ```cpp 1```, but it can
-    be changed. Usually, a ```cpp Stopwatch``` is connected to a
-    ```cpp System```.
-
-    ```cpp
-    real_t elapsed();
-    ```
-
-    Returns the time elapsed since the ```cpp Stopwatch``` was started.
-
-    ```cpp
-    void update() override;
-    ```
-
-    This method *must* be called to update the ```cpp Stopwatch```. It is
-    automatically called when the ```cpp Stopwatch``` is connected to a
-    ```cpp System```, or, more generally, to a ```cpp Notifier<>```.
-
-    #heading(level: 3, outlined: false, numbering: none)[Example]
-
-    ```cpp
-    System system;
-    Stopwatch s1, s2(2.5);
-
-    size_t iteration = 0;
-    system.addObserver(&s1);
-
-    while (s1.elapsed() < 10000) {
-        if (iteration == 1000) system.addObserver(&s2);
-        system.next(); iteration++;
-    }
-
-    std::cout << s1.elapsed() <<' '<< s2.elapsed() << std::endl;
-    ```
-]
-
-```cpp
-enum class TimerMode { Once, Repeating }
-```
-
-A ```cpp Timer``` can be either in ```cpp Repeating``` mode or in ```cpp Once```
-mode:
-- In ```cpp Repeating``` mode, everytime the timer hits 0, it resets
-- In ```cpp Once``` mode, when the timer hits 0, it stops
-
-```cpp
-class Timer : public Observer<>, public Notifier<>
-```
-
-A ```cpp Timer``` starts with a certain duration. At every iteration the
-duration decreases by $Delta$. When a ```cpp Timer``` hits 0, it sends a
-notification to its subscribers (with no input value).
-
-#block(inset: (left: 1em))[
-
-    ```cpp
-    Timer(real_t duration, TimerMode mode, real_t delta = 1);
-    ```
-
-    A ```cpp Timer``` requires the starting duration and it's mode. It's more
-    useful to use the ```cpp Once``` mode if the duration is different at each
-    reset, this way it can be set manually.
-
-    ```cpp
-    void set_duration(real_t time);
-    ```
-
-    Sets the current duration of the ```cpp Timer```. It's useful when the
-    duration is generated randomly each time the ```cpp Timer``` hits 0.
-
-    ```cpp
-    void update() override;
-    ```
-
-    This method must be called to updated the time of the ```cpp Timer```.
-    Generally the ```cpp Timer``` is connected to a ```cpp System```.
-
-    #heading(level: 3, outlined: false, numbering: none)[Example]
-
-    ```cpp
-    TODO: example
-    ```
-]
-
-#pagebreak()
-
-== ```cpp alias```
-
-```cpp
-template <typename T> class Alias
-```
-
-The ```cpp class Alias``` is used to create *strong aliases* (a strong alias is
-a type that can be used in place of its underlying type, except in templates, as
-its considere a totally different type).
-
-#block(inset: (left: 1em))[
-    ```cpp
-    Alias() {}
-    ```
-
-    It initialized the value for the underlying type to it's default one.
-
-    ```cpp
-    Alias(T value)
-    ```
-
-    It initialized the underlying type with a certain value. Useful when the
-    underlying type needs complex initialization. It also allows to assign a
-    value of the underlying type (e.g. ```cpp Alias<int> a_int = 5;```)
-
-    ```cpp
-    operator T() const
-    ```
-
-    Allows the ```cpp Alias<T>``` to be casted to ```cpp T``` (e.g.
-    ```cpp Alias<int> a_int = 5; int v = (int)a_int;```). The casting doesn't
-    need to be explicit.
-]
-
-```cpp
-STRONG_ALIAS(ALIAS, TYPE)
-```
-
-The ```cpp STRONG_ALIAS``` macro is used to quickly create a strong alias. The
-```cpp Alias<T>``` class is never used directly.
-
-== ```cpp observer```
-
-```cpp
-template <typename... T> class Observer
-```
-
-- TODO
-
-== ```cpp notifier```
-
-```cpp
-template <typename... T> class Notifier
-```
-
-- TODO
-
-== Auxiliary
-
-```cpp
-template <typename T> class Recorder : public Observer<T>
-```
-
-```cpp
-class Client : public Observer<U...>,
-               public Notifier<Observer<U...> *, T>
-```
-
-- TODO (+ ```cpp using Host```)
-
-```cpp
-class Server : public Observer<Observer<U...> *, T>
-```
-
-- TODO (+ ```cpp using Host```)
-
-```cpp
-class System : public Notifier<>
-```
-
-- TODO
-
-#pagebreak()
+// = MOCC library
+//
+//
+// - TODO: make and "examples" folder for the library
+// - TODO: automatically generate documentation from comments
+// Model CheCking library for the exam
+//
+// == Design
+//
+// Basically: the "Observer Pattern" @observer-pattern can be used to implement
+// MDPs, because a MDP is like an entity that "is notified" when something happens
+// (receives an input, in fact, in the case of MDPs, another name for input is
+// "action"), and notifies other entities (gives an output, or reward).
+//
+//
+// #figure(caption: `https://refactoring.guru/design-patterns/observer`)[
+//     #block(
+//         width: 100%,
+//         inset: 1em,
+//         stroke: luma(245),
+//         fill: luma(254),
+//         image("public/observer.png"),
+//     )
+// ]
+//
+// By using the generics (templates) in `C++` it's possible to model type-safe
+// MDPs, whose connections are easier to handle (if an entity receives inputs of
+// type ```cpp Request```, it cannot be mistakenly connected to an entity that
+// gives an output of type ```cpp Time```).
+//
+// #pagebreak()
+//
+// == ```cpp mocc```
+//
+// ```cpp
+// using real_t = double;
+// ```
+//
+// The ```cpp real_t``` type is used as an alias for floating point numbers to
+// ensure the same format is used everywhere in the library.
+//
+// ```cpp
+// using urng_t = std::default_random_engine;
+// ```
+//
+// The ```cpp urng_t``` type is used as an alias for
+// ```cpp std::default_random_engine``` to make the code easier to write.
+//
+// == ```cpp math```
+//
+// ```cpp
+// class Stat
+// ```
+//
+// The ```cpp Stat``` class is used to calculate the mean and the standard
+// deviation of a set of values (as discussed in @incremental-average and @welford)
+//
+// #block(inset: (left: 1em))[
+//     ```cpp
+//     void save(real_t x);
+//     ```
+//
+//     The ```cpp save()``` method is used to add a value to the set of values. The
+//     mean and the standard deviation are automatically updated when a new value
+//     is saved.
+//
+//     ```cpp
+//     real_t mean() const;
+//     ```
+//
+//     Returns the precalculated mean.
+//
+//     ```cpp
+//     real_t stddev() const;
+//     ```
+//
+//     Returns the precalculated standard deviation.
+//
+//     #heading(level: 3, outlined: false, numbering: none)[Example]
+//
+//     ```cpp
+//     Stat cost_stat;
+//
+//     cost_stat.save(302);
+//     cost_stat.save(305);
+//     cost_stat.save(295);
+//     cost_stat.save(298);
+//
+//     std::cout
+//       << cost_stat.mean() << " "
+//       << cost_stat.stddev() << std::endl;
+//     ```
+// ]
+//
+// #pagebreak()
+//
+// == ```cpp time```
+//
+//
+// ```cpp
+// STRONG_ALIAS(T, real_t)
+// ```
+//
+// The ```class T``` is the type for the *time*, it's reperesented as a
+// ```cpp real_t``` to allow working in smaller units of time (for exapmle, when
+// the main unit of time of the simulation is the _minute_, it could still be
+// useful to work with _seconds_). ```class T``` is a *strong alias*, meaning that
+// if a MDP takes in input ```cpp T```, it cannot be connected to a MDP that gives
+// in output a simple ```cpp real_t```.
+//
+// ```cpp
+// class Stopwatch : public Observer<>, public Notifier<T>
+// ```
+//
+// A ```cpp Stopwatch``` starts at time ```cpp 0```, and each iteration of the
+// system it increments it's time counter by $Delta$. It can be used to measure
+// time from a certain point of the simulation (it can be at any point of the
+// simulation). It sends a notification with the elapsed time at each iteration.
+//
+// #block(inset: (left: 1em))[
+//     ```cpp
+//     Stopwatch(real_t delta = 1);
+//     ```
+//
+//     The default $Delta$ for the ```cpp Stopwatch``` is ```cpp 1```, but it can
+//     be changed. Usually, a ```cpp Stopwatch``` is connected to a
+//     ```cpp System```.
+//
+//     ```cpp
+//     real_t elapsed();
+//     ```
+//
+//     Returns the time elapsed since the ```cpp Stopwatch``` was started.
+//
+//     ```cpp
+//     void update() override;
+//     ```
+//
+//     This method *must* be called to update the ```cpp Stopwatch```. It is
+//     automatically called when the ```cpp Stopwatch``` is connected to a
+//     ```cpp System```, or, more generally, to a ```cpp Notifier<>```.
+//
+//     #heading(level: 3, outlined: false, numbering: none)[Example]
+//
+//     ```cpp
+//     System system;
+//     Stopwatch s1, s2(2.5);
+//
+//     size_t iteration = 0;
+//     system.addObserver(&s1);
+//
+//     while (s1.elapsed() < 10000) {
+//         if (iteration == 1000) system.addObserver(&s2);
+//         system.next(); iteration++;
+//     }
+//
+//     std::cout << s1.elapsed() <<' '<< s2.elapsed() << std::endl;
+//     ```
+// ]
+//
+// ```cpp
+// enum class TimerMode { Once, Repeating }
+// ```
+//
+// A ```cpp Timer``` can be either in ```cpp Repeating``` mode or in ```cpp Once```
+// mode:
+// - In ```cpp Repeating``` mode, everytime the timer hits 0, it resets
+// - In ```cpp Once``` mode, when the timer hits 0, it stops
+//
+// ```cpp
+// class Timer : public Observer<>, public Notifier<>
+// ```
+//
+// A ```cpp Timer``` starts with a certain duration. At every iteration the
+// duration decreases by $Delta$. When a ```cpp Timer``` hits 0, it sends a
+// notification to its subscribers (with no input value).
+//
+// #block(inset: (left: 1em))[
+//
+//     ```cpp
+//     Timer(real_t duration, TimerMode mode, real_t delta = 1);
+//     ```
+//
+//     A ```cpp Timer``` requires the starting duration and it's mode. It's more
+//     useful to use the ```cpp Once``` mode if the duration is different at each
+//     reset, this way it can be set manually.
+//
+//     ```cpp
+//     void set_duration(real_t time);
+//     ```
+//
+//     Sets the current duration of the ```cpp Timer```. It's useful when the
+//     duration is generated randomly each time the ```cpp Timer``` hits 0.
+//
+//     ```cpp
+//     void update() override;
+//     ```
+//
+//     This method must be called to updated the time of the ```cpp Timer```.
+//     Generally the ```cpp Timer``` is connected to a ```cpp System```.
+//
+//     #heading(level: 3, outlined: false, numbering: none)[Example]
+//
+//     ```cpp
+//     TODO: example
+//     ```
+// ]
+//
+// #pagebreak()
+//
+// == ```cpp alias```
+//
+// ```cpp
+// template <typename T> class Alias
+// ```
+//
+// The ```cpp class Alias``` is used to create *strong aliases* (a strong alias is
+// a type that can be used in place of its underlying type, except in templates, as
+// its considere a totally different type).
+//
+// #block(inset: (left: 1em))[
+//     ```cpp
+//     Alias() {}
+//     ```
+//
+//     It initialized the value for the underlying type to it's default one.
+//
+//     ```cpp
+//     Alias(T value)
+//     ```
+//
+//     It initialized the underlying type with a certain value. Useful when the
+//     underlying type needs complex initialization. It also allows to assign a
+//     value of the underlying type (e.g. ```cpp Alias<int> a_int = 5;```)
+//
+//     ```cpp
+//     operator T() const
+//     ```
+//
+//     Allows the ```cpp Alias<T>``` to be casted to ```cpp T``` (e.g.
+//     ```cpp Alias<int> a_int = 5; int v = (int)a_int;```). The casting doesn't
+//     need to be explicit.
+// ]
+//
+// ```cpp
+// STRONG_ALIAS(ALIAS, TYPE)
+// ```
+//
+// The ```cpp STRONG_ALIAS``` macro is used to quickly create a strong alias. The
+// ```cpp Alias<T>``` class is never used directly.
+//
+// == ```cpp observer```
+//
+// ```cpp
+// template <typename... T> class Observer
+// ```
+//
+// - TODO
+//
+// == ```cpp notifier```
+//
+// ```cpp
+// template <typename... T> class Notifier
+// ```
+//
+// - TODO
+//
+// == Auxiliary
+//
+// ```cpp
+// template <typename T> class Recorder : public Observer<T>
+// ```
+//
+// ```cpp
+// class Client : public Observer<U...>,
+//                public Notifier<Observer<U...> *, T>
+// ```
+//
+// - TODO (+ ```cpp using Host```)
+//
+// ```cpp
+// class Server : public Observer<Observer<U...> *, T>
+// ```
+//
+// - TODO (+ ```cpp using Host```)
+//
+// ```cpp
+// class System : public Notifier<>
+// ```
+//
+// - TODO
+//
+// #pagebreak()
 
 = Exam
 
@@ -1760,27 +1759,27 @@ Simulating the system is actually easy:
     ```
 ]
 
-=== Director
-
-== Task management
-
-=== Worker
-
-=== Generator
-
-=== Dispatcher (not the correct name)
-
-=== Manager (not the correct name)
-
-
-== Backend load balancing
-
-=== Env
-
-=== Dispatcher, Server and Database
-
-=== Response time
-
-== Heater simulation
+// === Director
+//
+// == Task management
+//
+// === Worker
+//
+// === Generator
+//
+// === Dispatcher (not the correct name)
+//
+// === Manager (not the correct name)
+//
+//
+// == Backend load balancing
+//
+// === Env
+//
+// === Dispatcher, Server and Database
+//
+// === Response time
+//
+// == Heater simulation
 
 #page(bibliography("public/bibliography.bib"))

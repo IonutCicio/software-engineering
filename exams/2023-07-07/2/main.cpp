@@ -56,5 +56,5 @@ int main() {
         // clang-format on
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

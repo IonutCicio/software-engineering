@@ -1,41 +1,74 @@
+#include <cstddef>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 
+#include "../../../mocc/math.hpp"
+#include "../../../mocc/mocc.hpp"
 #include "../../../mocc/system.hpp"
-#include "customer.hpp"
-#include "monitor.hpp"
-#include "parameters.hpp"
+#include "../../../mocc/time.hpp"
+
+urng_t urng = pseudo_random_engine_from_device();
+real_t AVG, VAR;
+
+const size_t T = 1, HORIZON = 1000000;
+
+System _system;
+Time _time(T, &_system);
+std::normal_distribution<> random_time_interval;
+
+struct CustomerPurchaseRequest {
+    real_t time;
+};
+
+struct Customer : Observer<Timer *>, Notifier<CustomerPurchaseRequest> {
+    Customer() { new Timer(1, TimerMode::Once, &_time, this); }
+
+    void update(Timer *timer) override {
+        notify(CustomerPurchaseRequest{.time = _time.elapsedTime()});
+        timer->resetWithDuration(random_time_interval(urng));
+    }
+};
+
+struct Monitor : Observer<CustomerPurchaseRequest> {
+    real_t last_request_time = 0;
+    DataDistribution requests_delta;
+
+    void update(CustomerPurchaseRequest request) {
+        requests_delta.insertDataPoint(request.time - last_request_time);
+        last_request_time = request.time;
+    }
+};
 
 int main() {
     {
         std::ifstream parameters("parameters.txt");
 
-        std::string line_type;
-        while (parameters >> line_type)
-            if (line_type == "Avg")
+        std::string format;
+        while (parameters >> format) {
+            if (format == "Avg") {
                 parameters >> AVG;
-            else if (line_type == "StdDev")
+            } else if (format == "StdDev") {
                 parameters >> VAR;
+            }
+        }
+        random_time_interval = std::normal_distribution<>(AVG, VAR);
 
         parameters.close();
     }
 
-    System system;
-    Stopwatch stopwatch(T);
-    Customer customer(system);
+    Customer customer;
     Monitor monitor;
-
-    system.addObserver(&stopwatch);
-    stopwatch.addObserver(&monitor);
     customer.addObserver(&monitor);
 
-    while (stopwatch.elapsedTime() <= HORIZON)
-        system.next();
+    while (_time.elapsedTime() <= HORIZON) {
+        _system.next();
+    }
 
     std::ofstream("results.txt")
         << "2025-01-09" << std::endl
-        << "Avg " << monitor.requests_interval_analysis.mean() << std::endl
-        << "StdDev " << monitor.requests_interval_analysis.stddev();
+        << "Avg " << monitor.requests_delta.mean() << std::endl
+        << "StdDev " << monitor.requests_delta.stddev() << std::endl;
 
-    return 0;
+    return EXIT_SUCCESS;
 }

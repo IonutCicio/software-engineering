@@ -1,3 +1,4 @@
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
 #include <random>
@@ -8,7 +9,7 @@
 int main() {
     size_t N;
     std::vector<std::discrete_distribution<>> transition_matrix;
-    matrix transition_cost;
+    matrix<real_t> transition_cost;
 
     {
         std::ifstream parameters("parameters.txt");
@@ -21,7 +22,7 @@ int main() {
         char format;
         std::vector<Transition> transitions;
 
-        while (parameters >> format)
+        while (parameters >> format) {
             switch (format) {
             case 'N':
                 parameters >> N;
@@ -33,11 +34,12 @@ int main() {
                 transitions.push_back(transition);
                 break;
             }
+        }
 
         parameters.close();
 
-        transition_cost = matrix(N, std::vector<real_t>(N, 0));
-        matrix transition_probability(N, std::vector<real_t>(N, 0));
+        transition_cost = matrix<real_t>(N, std::vector<real_t>(N, 0));
+        matrix<real_t> transition_probability(N, std::vector<real_t>(N, 0));
         transition_probability[N - 1][N - 1] = 1;
 
         for (auto &transition : transitions) {
@@ -53,7 +55,7 @@ int main() {
         }
     }
 
-    OnlineDataAnalysis project_cost_analysis;
+    DataDistribution project_cost_distribution;
 
     urng_t urng = pseudo_random_engine_from_device();
     const size_t EXPERIMENTS = 1000, INITIAL_STATE = 0;
@@ -68,11 +70,11 @@ int main() {
             current_state = next_state;
         }
 
-        project_cost_analysis.insertDataPoint(project_cost);
+        project_cost_distribution.insertDataPoint(project_cost);
     }
 
     std::ofstream("results.txt")
-        << "2025-01-09\nC " << project_cost_analysis.mean() << std::endl;
+        << "2025-01-09\nC " << project_cost_distribution.mean() << std::endl;
 
-    return 0;
+    return EXIT_SUCCESS;
 }

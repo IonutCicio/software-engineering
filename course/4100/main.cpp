@@ -32,9 +32,10 @@ int main() {
             costs += 40;
 
         phase = transition_matrix[phase](urng);
-        file << time << ' ' << phase << ' ' << costs << std::endl;
+        file << time << ' ' << phase << ' ' << costs
+             << std::endl;
     }
 
     file.close();
-    return 0;
+    return EXIT_SUCCESS;
 }

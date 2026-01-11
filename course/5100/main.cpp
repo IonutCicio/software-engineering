@@ -7,21 +7,25 @@
 const size_t HORIZON = 20, STATES_SIZE = 10;
 
 int main() {
-    std::random_device random_device;
-    urng_t urng(random_device());
+    urng_t urng = pseudo_random_engine_from_device();
 
-    auto random_state = std::uniform_int_distribution<>(0, STATES_SIZE - 1);
+    auto random_state =
+        std::uniform_int_distribution<>(0, STATES_SIZE - 1);
     std::uniform_real_distribution<> uniform(0, 1);
 
-    std::vector<std::discrete_distribution<>> transition_matrix(STATES_SIZE);
+    std::vector<std::discrete_distribution<>>
+        transition_matrix(STATES_SIZE);
 
     for (size_t state = 0; state < STATES_SIZE; state++) {
         std::vector<real_t> weights(STATES_SIZE);
-        for (auto &weight : weights)
+        for (auto &weight : weights) {
             weight = uniform(urng);
+        }
 
         transition_matrix[state] =
-            std::discrete_distribution<>(weights.begin(), weights.end());
+            std::discrete_distribution<>(
+                weights.begin(), weights.end()
+            );
     }
 
     std::ofstream file("logs");
@@ -33,5 +37,5 @@ int main() {
     }
 
     file.close();
-    return 0;
+    return EXIT_SUCCESS;
 }

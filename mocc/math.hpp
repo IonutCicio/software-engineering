@@ -15,7 +15,7 @@
  * project_cost.mean(); // 15000
  * project_cost.stddev(); // 5000
  * */
-class OnlineDataAnalysis {
+class DataDistribution {
   private:
     real_t mean_ = 0, m_2__ = 0;
     size_t number_of_data_points = 0;
