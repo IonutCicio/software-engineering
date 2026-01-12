@@ -13,7 +13,6 @@ size_t N;
 
 const size_t T = 1, HORIZON = 1000000;
 
-std::normal_distribution<> random_interval;
 System _system;
 Time _time(T, &_system);
 
@@ -27,16 +26,16 @@ struct CustomerRequestsCount {
 };
 
 struct Customer : Observer<Timer *>, Notifier<CustomerPurchaseRequest> {
-
     const size_t id;
+    std::normal_distribution<> random_time_interval;
 
-    Customer(size_t id) : id(id) {
+    Customer(size_t id) : id(id), random_time_interval(AVG, VAR) {
         new Timer(AVG, TimerMode::Once, &_time, this);
     }
 
     void update(Timer *timer) override {
         notify(CustomerPurchaseRequest{.id = id, .time = _time.elapsedTime()});
-        timer->resetWithDuration(random_interval(urng));
+        timer->resetWithDuration(random_time_interval(urng));
     }
 };
 
@@ -99,7 +98,6 @@ int main() {
                 parameters >> VAR;
             }
         }
-        random_interval = std::normal_distribution<>(AVG, VAR);
 
         parameters.close();
     }

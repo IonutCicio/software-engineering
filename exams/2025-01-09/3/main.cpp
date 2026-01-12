@@ -15,14 +15,17 @@ const size_t T = 1, HORIZON = 1000000;
 
 System _system;
 Time _time(T, &_system);
-std::normal_distribution<> random_time_interval;
 
 struct CustomerPurchaseRequest {
     real_t time;
 };
 
 struct Customer : Observer<Timer *>, Notifier<CustomerPurchaseRequest> {
-    Customer() { new Timer(1, TimerMode::Once, &_time, this); }
+    std::normal_distribution<> random_time_interval;
+
+    Customer() : random_time_interval(AVG, VAR) {
+        new Timer(1, TimerMode::Once, &_time, this);
+    }
 
     void update(Timer *timer) override {
         notify(CustomerPurchaseRequest{.time = _time.elapsedTime()});
@@ -52,7 +55,6 @@ int main() {
                 parameters >> VAR;
             }
         }
-        random_time_interval = std::normal_distribution<>(AVG, VAR);
 
         parameters.close();
     }

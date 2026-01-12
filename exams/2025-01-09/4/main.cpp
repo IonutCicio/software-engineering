@@ -15,7 +15,6 @@ const size_t T = 1, HORIZON = 1000000;
 
 System _system;
 Time _time(T, &_system);
-std::normal_distribution<> random_time_interval;
 
 struct CustomerPurchaseRequest {
     size_t id;
@@ -28,8 +27,9 @@ struct CustomerRequestsCount {
 
 struct Customer : Observer<Timer *>, Notifier<CustomerPurchaseRequest> {
     const size_t id;
+    std::normal_distribution<> random_time_interval;
 
-    Customer(size_t id) : id(id) {
+    Customer(size_t id) : id(id), random_time_interval(AVG, VAR) {
         new Timer(AVG, TimerMode::Once, &_time, this);
     }
 
@@ -96,7 +96,6 @@ int main() {
                 parameters >> VAR;
             }
         }
-        random_time_interval = std::normal_distribution(AVG, VAR);
 
         parameters.close();
     }
